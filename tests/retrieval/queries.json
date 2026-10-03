@@ -1,0 +1,162 @@
+[
+  {
+    "id": "q01",
+    "query": "What is the engineering deployment procedure?",
+    "tenant": "a",
+    "role": "engineer",
+    "expected_doc": "engineering_deployment",
+    "expected_chunk": "deployment procedure for kubernetes cluster in production with canary release"
+  },
+  {
+    "id": "q02",
+    "query": "How do we rollback a failed production release?",
+    "tenant": "a",
+    "role": "engineer",
+    "expected_doc": "engineering_deployment",
+    "expected_chunk": "automated rollback steps for helm deployment upon health check failure"
+  },
+  {
+    "id": "q03",
+    "query": "Kubernetes cluster configuration and secrets management",
+    "tenant": "a",
+    "role": "engineer",
+    "expected_doc": "engineering_deployment",
+    "expected_chunk": "kubernetes secrets and configmaps are mounted securely with encryption at rest"
+  },
+  {
+    "id": "q04",
+    "query": "What is the company leave policy and annual vacation days?",
+    "tenant": "a",
+    "role": "hr",
+    "expected_doc": "hr_handbook",
+    "expected_chunk": "annual paid leave policy grants twenty-five days vacation and ten sick days"
+  },
+  {
+    "id": "q05",
+    "query": "Employee compensation review and salary bands",
+    "tenant": "a",
+    "role": "hr",
+    "expected_doc": "hr_salary_bands",
+    "expected_chunk": "salary bands for engineering and operations levels 1 through 6 merit increase guidelines"
+  },
+  {
+    "id": "q06",
+    "query": "Health insurance and medical benefits coverage",
+    "tenant": "a",
+    "role": "hr",
+    "expected_doc": "hr_handbook",
+    "expected_chunk": "health insurance covers dental optical and comprehensive inpatient hospitalisation"
+  },
+  {
+    "id": "q07",
+    "query": "Quarterly fiscal budget and revenue forecast",
+    "tenant": "a",
+    "role": "finance",
+    "expected_doc": "finance_audit",
+    "expected_chunk": "quarterly financial budget and fiscal forecast revenue targets for current year"
+  },
+  {
+    "id": "q08",
+    "query": "Tax compliance and external audit procedures",
+    "tenant": "a",
+    "role": "finance",
+    "expected_doc": "finance_audit",
+    "expected_chunk": "statutory tax compliance reports and external audit schedule for quarter four"
+  },
+  {
+    "id": "q09",
+    "query": "Capital expenditures and procurement approval workflow",
+    "tenant": "a",
+    "role": "finance",
+    "expected_doc": "finance_audit",
+    "expected_chunk": "capital expenditure exceeding ten thousand requires cfo authorization"
+  },
+  {
+    "id": "q10",
+    "query": "Tenant B server architecture and deployment pipeline",
+    "tenant": "b",
+    "role": "engineer",
+    "expected_doc": "engineering_deployment",
+    "expected_chunk": "tenant b infrastructure architecture utilizes terraform on aws cloud platform"
+  },
+  {
+    "id": "q11",
+    "query": "Tenant B container registry and docker build caching",
+    "tenant": "b",
+    "role": "engineer",
+    "expected_doc": "engineering_deployment",
+    "expected_chunk": "container registry authentication tokens rotate every ninety days"
+  },
+  {
+    "id": "q12",
+    "query": "Tenant B HR parental leave and maternity benefits",
+    "tenant": "b",
+    "role": "hr",
+    "expected_doc": "hr_handbook",
+    "expected_chunk": "tenant b provides twenty weeks fully paid parental leave for new parents"
+  },
+  {
+    "id": "q13",
+    "query": "Tenant B executive compensation and stock option grants",
+    "tenant": "b",
+    "role": "hr",
+    "expected_doc": "hr_salary_bands",
+    "expected_chunk": "executive compensation package includes base salary and equity vesting schedule"
+  },
+  {
+    "id": "q14",
+    "query": "Tenant B annual accounting balance sheet and profit loss",
+    "tenant": "b",
+    "role": "finance",
+    "expected_doc": "finance_audit",
+    "expected_chunk": "tenant b audited balance sheet shows healthy cash reserves and low leverage"
+  },
+  {
+    "id": "q15",
+    "query": "Tenant B vendor payment terms and invoice processing",
+    "tenant": "b",
+    "role": "finance",
+    "expected_doc": "finance_audit",
+    "expected_chunk": "invoices are processed on net thirty terms upon three-way matching approval"
+  },
+  {
+    "id": "q16",
+    "query": "Continuous integration test execution and automated linting",
+    "tenant": "a",
+    "role": "engineer",
+    "expected_doc": "engineering_deployment",
+    "expected_chunk": "automated tests run on pull request and require all checks to pass before merging"
+  },
+  {
+    "id": "q17",
+    "query": "Performance appraisal and promotion review cycles",
+    "tenant": "a",
+    "role": "hr",
+    "expected_doc": "hr_salary_bands",
+    "expected_chunk": "bi-annual performance review cycle determines eligibility for level advancement"
+  },
+  {
+    "id": "q18",
+    "query": "Accounts receivable aging and bad debt provisioning",
+    "tenant": "a",
+    "role": "finance",
+    "expected_doc": "finance_audit",
+    "expected_chunk": "accounts receivable overdue past ninety days triggers reserve allowance"
+  },
+  {
+    "id": "q19",
+    "query": "Tenant B database backup retention and disaster recovery",
+    "tenant": "b",
+    "role": "engineer",
+    "expected_doc": "engineering_deployment",
+    "expected_chunk": "daily database snapshots are retained for thirty days in secondary region"
+  },
+  {
+    "id": "q20",
+    "query": "Tenant B employee retirement fund matching and 401k",
+    "tenant": "b",
+    "role": "hr",
+    "expected_doc": "hr_handbook",
+    "expected_chunk": "retirement savings matching matches up to five percent of employee contribution"
+  }
+]

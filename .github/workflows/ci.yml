@@ -1,0 +1,33 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: permrag_owner
+          POSTGRES_PASSWORD: owner_password
+          POSTGRES_DB: permrag
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U permrag_owner -d permrag"
+          --health-interval 3s --health-retries 20
+    env:
+      EMBEDDER: fake
+      PGPASSWORD: owner_password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt
+      - name: Create least-privilege roles
+        run: |
+          PGHOST=localhost POSTGRES_USER=permrag_owner POSTGRES_DB=permrag \
+          APP_DB_PASSWORD=app_password WORKER_DB_PASSWORD=worker_password \
+          bash -c 'export PGHOST PGPASSWORD; ./db/init/01_roles.sh'
+      - run: alembic upgrade head
+      - name: Leakage + unit tests
+        run: pytest -q

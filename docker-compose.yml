@@ -1,0 +1,53 @@
+x-app-env: &app-env
+  ENV: dev
+  OWNER_DATABASE_URL: postgresql+psycopg://permrag_owner:owner_password@db:5432/permrag
+  APP_DATABASE_URL: postgresql+asyncpg://app_user:${APP_DB_PASSWORD:-app_password}@db:5432/permrag
+  WORKER_DATABASE_URL: postgresql+asyncpg://rag_worker:${WORKER_DB_PASSWORD:-worker_password}@db:5432/permrag
+  JWT_SECRET: ${JWT_SECRET:-change-me-to-a-long-random-string}
+  EMBEDDER: ${EMBEDDER:-fastembed}
+  MODEL_CACHE_DIR: /models
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: permrag_owner
+      POSTGRES_PASSWORD: owner_password
+      POSTGRES_DB: permrag
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:-app_password}
+      WORKER_DB_PASSWORD: ${WORKER_DB_PASSWORD:-worker_password}
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U permrag_owner -d permrag"]
+      interval: 3s
+      retries: 20
+
+  migrate:
+    build: .
+    command: alembic upgrade head
+    environment: *app-env
+    depends_on:
+      db: { condition: service_healthy }
+
+  api:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment: *app-env
+    ports: ["8000:8000"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  worker:
+    build: .
+    command: python -m app.worker
+    environment: *app-env
+    volumes: [models:/models]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+volumes:
+  pgdata:
+  models:
