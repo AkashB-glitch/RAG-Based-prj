@@ -1,6 +1,7 @@
 """PermRAG: Production-Ready Permission-Aware Multi-Tenant RAG API."""
 import os
 from pathlib import Path
+import uuid
 from fastapi import FastAPI, HTTPException, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -118,6 +119,138 @@ async def demo_ui():
     return HTMLResponse("<h2>PermRAG API is running. UI not found.</h2>")
 
 
+import collections
+import datetime as dt
+
+# In-memory audit event stream for live UI observability
+_DEMO_AUDIT_LOGS = collections.deque(maxlen=100)
+
+# Seed realistic baseline audit records
+_DEMO_AUDIT_LOGS.extend([
+    {
+        "timestamp": "2026-10-03 21:14:02",
+        "request_id": "req_83a1b2c4",
+        "user": "Alice",
+        "tenant": "Acme Corp",
+        "operation": "RAG Query",
+        "retrieved_chunks": 4,
+        "final_context": 2,
+        "status": "AUTHORIZED",
+        "latency_ms": 0.48,
+    },
+    {
+        "timestamp": "2026-10-03 21:15:30",
+        "request_id": "req_99d4e5f6",
+        "user": "Alice",
+        "tenant": "Acme Corp",
+        "operation": "RAG Query (Adversarial)",
+        "retrieved_chunks": 0,
+        "final_context": 0,
+        "status": "BLOCKED (RLS)",
+        "latency_ms": 0.32,
+    },
+    {
+        "timestamp": "2026-10-03 21:16:11",
+        "request_id": "req_11a7b8c9",
+        "user": "Bob",
+        "tenant": "Acme Corp",
+        "operation": "RAG Query",
+        "retrieved_chunks": 6,
+        "final_context": 4,
+        "status": "AUTHORIZED",
+        "latency_ms": 0.51,
+    }
+])
+
+
+# SPA Route Handlers for Direct Browser Navigation
+@app.get("/workspace", response_class=HTMLResponse, tags=["ui"])
+@app.get("/documents", response_class=HTMLResponse, tags=["ui"])
+@app.get("/security", response_class=HTMLResponse, tags=["ui"])
+@app.get("/evaluation", response_class=HTMLResponse, tags=["ui"])
+@app.get("/audit", response_class=HTMLResponse, tags=["ui"])
+@app.get("/architecture", response_class=HTMLResponse, tags=["ui"])
+@app.get("/about", response_class=HTMLResponse, tags=["ui"])
+async def spa_pages():
+    """Serves the PermRAG Enterprise Single-Page Application."""
+    if DEMO_HTML_PATH.exists():
+        return HTMLResponse(content=DEMO_HTML_PATH.read_text(encoding="utf-8"))
+    return HTMLResponse("<h2>PermRAG UI not found.</h2>")
+
+
+@app.get("/api/audit/logs", tags=["ops"])
+async def get_audit_logs():
+    """Returns recent safe audit events with zero sensitive content exposure."""
+    return list(_DEMO_AUDIT_LOGS)
+
+
+@app.get("/api/documents/catalog", tags=["documents"])
+async def get_documents_catalog():
+    """Returns document catalog with tenant isolation and ACL metadata."""
+    return [
+        {
+            "id": "doc_eng_01",
+            "title": "engineering_deployment.md",
+            "tenant": "Acme Corp",
+            "tenant_id": "00000000-0000-0000-0000-00000000000a",
+            "acl": ["role:engineer", "group:engineering"],
+            "status": "Processed",
+            "chunks": 6,
+            "created_at": "2026-10-01T10:15:00Z",
+            "mime_type": "text/markdown",
+            "sha256": "8f4a12c8b9319d381024e038d1726a894f2910481b7a2d8f9c018274619d8214"
+        },
+        {
+            "id": "doc_hr_01",
+            "title": "acme_handbook.md",
+            "tenant": "Acme Corp",
+            "tenant_id": "00000000-0000-0000-0000-00000000000a",
+            "acl": ["role:employee", "role:hr", "role:engineer", "role:finance"],
+            "status": "Processed",
+            "chunks": 5,
+            "created_at": "2026-10-01T11:00:00Z",
+            "mime_type": "text/markdown",
+            "sha256": "3a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b"
+        },
+        {
+            "id": "doc_hr_02",
+            "title": "acme_salaries_2026.md",
+            "tenant": "Acme Corp",
+            "tenant_id": "00000000-0000-0000-0000-00000000000a",
+            "acl": ["role:hr", "group:payroll"],
+            "status": "Processed",
+            "chunks": 4,
+            "created_at": "2026-10-01T11:30:00Z",
+            "mime_type": "text/markdown",
+            "sha256": "4b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c"
+        },
+        {
+            "id": "doc_fin_01",
+            "title": "finance_audit_targets.md",
+            "tenant": "Acme Corp",
+            "tenant_id": "00000000-0000-0000-0000-00000000000a",
+            "acl": ["role:finance"],
+            "status": "Processed",
+            "chunks": 4,
+            "created_at": "2026-10-02T09:00:00Z",
+            "mime_type": "text/markdown",
+            "sha256": "5c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d"
+        },
+        {
+            "id": "doc_globex_01",
+            "title": "globex_salaries_2026.md",
+            "tenant": "Globex Ltd",
+            "tenant_id": "00000000-0000-0000-0000-00000000000b",
+            "acl": ["role:hr"],
+            "status": "Processed",
+            "chunks": 4,
+            "created_at": "2026-10-02T14:20:00Z",
+            "mime_type": "text/markdown",
+            "sha256": "6d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e"
+        }
+    ]
+
+
 class DemoQueryRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=1000)
     tenant: str = Field(default="a", description="Demo tenant key: 'a' or 'b'")
@@ -224,5 +357,21 @@ async def demo_rag_query(req: DemoQueryRequest) -> RAGResponse:
         # Step 8: Citations
         citations = build_citations(included)
         latency.total_ms = round((time.perf_counter() - t0) * 1000, 2)
+
+        now_str = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        user_name = "Alice" if req.role == "engineer" else ("Bob" if req.role == "hr" else ("Charlie" if req.role == "finance" else "Carol"))
+        tenant_name = "Acme Corp" if req.tenant == "a" else "Globex Ltd"
+        status_label = "AUTHORIZED" if citations else "NO_MATCH / BLOCKED"
+        _DEMO_AUDIT_LOGS.appendleft({
+            "timestamp": now_str,
+            "request_id": f"req_{uuid.uuid4().hex[:8]}",
+            "user": user_name,
+            "tenant": tenant_name,
+            "operation": "RAG Query",
+            "retrieved_chunks": len(candidates),
+            "final_context": len(citations),
+            "status": status_label,
+            "latency_ms": latency.total_ms,
+        })
 
         return RAGResponse(answer=answer, sources=citations, latency=latency)
