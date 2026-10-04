@@ -29,3 +29,4 @@ class RAGResponse(BaseModel):
     answer: str
     sources: list[SourceCitation]
     latency: LatencyBreakdown | None = None
+    database_mode: str = "postgresql_rls"
